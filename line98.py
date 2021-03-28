@@ -9,9 +9,9 @@ pygame.font.init()
 WIN_WIDTH = WIN_HEIGHT = 600                                # height and width of window
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_WIDTH))       # initilize win form
 pygame.display.set_caption("LINE 98")                       # win caption
-SCORE_TEXT_FONT = pygame.font.SysFont('Courier', 30, bold=True)
-SCORE_FONT = pygame.font.Font('CursedTimerUlil-Aznm.ttf', 30, bold=True)
-BUTTON_FONT = pygame.font.Font('Poppins-Bold.ttf', 18)
+SCORE_TEXT_FONT = pygame.font.Font('./fonts/CursedTimerUlil-Aznm.ttf', 30)
+SCORE_FONT = pygame.font.Font('./fonts/CursedTimerUlil-Aznm.ttf', 30, bold=True)
+BUTTON_FONT = pygame.font.Font('./fonts/Poppins-Bold.ttf', 18)
 
 
 # Grid Configuration
@@ -31,6 +31,8 @@ GREEN = (62, 224, 86)
 
 ICON_IMAGES = pygame.image.load('./images/line98.png')
 SCORE_DISPLAY = pygame.image.load('./images/scoreDisplay.png')
+GAMEOVER_IMAGE = pygame.image.load('./images/gameOver4.png')
+CLOSEICON = pygame.image.load('./images/cancel.png')
 
 # Ball's Images
 IMAGES = {
@@ -57,7 +59,7 @@ IMAGES = {
 }
 
 
-# $$$$$$$$$$$$********* Square contains 1 ball $$$$$$$$$$$$********* #
+# $$$$$$$$$$$$********* Square contains 1 ball *********$$$$$$$$$$$$ #
 class Spot():
     def __init__(self, row, column):
         self.row = row
@@ -167,8 +169,7 @@ class Spot():
             self.mainImg = win.blit(IMAGES[self.color].get('small'), (newX, newY))
 
 
-
-# $$$$$$$$$$$$********* Grid contains all the balls $$$$$$$$$$$$********* #
+# $$$$$$$$$$$$********* Grid contains all the balls *********$$$$$$$$$$$$ #
 class Grid():
     def __init__(self):
         # Grid coordinate's config
@@ -179,6 +180,7 @@ class Grid():
         self.y = WIN_HEIGHT - self.height -  self.marginBottom
         
         # ...
+        self.newBabies = 20
         self.freeSpots = []
         self.babies = []
         self.lastState = []
@@ -249,7 +251,10 @@ class Grid():
     # make 3 random babies
     def makeBabies(self):
         self.babies = []
-        while len(self.babies) < 3:
+        if len(self.freeSpots) < self.newBabies:
+            return
+        
+        while len(self.babies) < self.newBabies:
             newRow, newCol = self.randomSquare()
 
             if self.grid[newRow][newCol].baby:
@@ -299,7 +304,6 @@ class Grid():
 
                 if spot.baby:
                     self.lastBabies.append(spot)
-
 
     # Undo previous move
     def undo(self):
@@ -396,7 +400,7 @@ class Grid():
             pygame.time.delay(50)
             pygame.display.update()
         
-
+        # Checking for available spots
         for row in range(self.rows):
             for col in range(self.cols):
                 if self.grid[row][col].alive and (row, col) in self.freeSpots:
@@ -409,7 +413,7 @@ class Grid():
         return point
 
     # ****************** BFS Algorithm ****************** #
-    def findShortestPath(self, start, end, drawFunc):
+    def findShortestPath(self, start, end):
         distance = [[-1 for spot in range(self.rows + 1)] for row in range(self.rows + 1)]
         prev = [[None for spot in range(self.rows + 1)] for row in range(self.rows + 1)]
         path = []
@@ -492,8 +496,6 @@ class Grid():
                     colQueue.append(neighCol)
 
                     prev[neighRow][neighCol] = (row, col)
-
-            drawFunc()
         return False
 
     # Reconstruct the path found by algorithm
@@ -509,7 +511,7 @@ class Grid():
         return path
 
 
-# $$$$$$$$$$$$********* Button $$$$$$$$$$$$********* #
+# $$$$$$$$$$$$********* Button *********$$$$$$$$$$$$ #
 class Button():
     def __init__(self, x, y, width=120, height=30, text="A button", fontColor=WHITE, bgColor=BLACK):
         self.x = x
@@ -520,18 +522,23 @@ class Button():
         self.fontColor = fontColor
         self.bgColor = bgColor
 
+        self.isPressed = False
+
     def draw(self, win):
-        pygame.draw.rect(win, self.bgColor, (self.x, self.y, self.width, self.height))
+        backGroundColor = BLACK if self.isPressed else self.bgColor
+        fontColor = WHITE if self.isPressed else self.fontColor
+
+        pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height))
 
         # Center the text
-        text = BUTTON_FONT.render(self.text, True, self.fontColor)
+        text = BUTTON_FONT.render(self.text, True, fontColor)
         textWidth, textHeight = text.get_size()
         textX = self.x + (self.width - textWidth) // 2
         textY = self.y + (self.height - textHeight) // 2
         
         win.blit(text, (textX, textY))
     
-    def isClicked(self, pos):
+    def isPointed(self, pos):
         mouseX, mouseY = pos
 
         if mouseX < self.x or mouseX > self.x + self.width:
@@ -541,12 +548,35 @@ class Button():
             return False
 
         return True
+    
+    def __str__(self):
+        return f"Button {self.text}"
 
 
+# $$$$$$$$$$$$********* GameOver Board *********$$$$$$$$$$$$ #
+class GameOverBoard():
+    def __init__(self):
+        self.x = 150
+        self.y = 200
+        self.width = 250
+        self.height = 250
+
+        self.activated = False
+    
+    def draw(self, win):
+        if self.activated:
+            win.blit(GAMEOVER_IMAGE, (175, 200))
+
+            closeX = self.x + self.width - 16
+            closeY = self.y - 32
+            win.blit(CLOSEICON, (closeX, closeY))
+    
+    def isClose(self):
+        pass
 
 
 # Update main win everey frame
-def draw(win, grid, buttons, score=0):
+def draw(win, grid, buttons, score=0, goBoard=None):
     win.fill(TURQUOISE)
     grid.draw(win)
     
@@ -564,22 +594,22 @@ def draw(win, grid, buttons, score=0):
     for btn in buttons:
         btn.draw(win)
     
+    if goBoard:
+        goBoard.draw(win)
+    
     pygame.display.update()
 
-
-# Get the col and row of the cliked Spot
-def getClikedPos(pos):
-    x, y = pos
-    
-    return x, y
 
 
 def main():
     grid = Grid()
     grid.resetNewRound()
 
+    goBoard = GameOverBoard()
+
     buttons = []
 
+    # Create button 
     y = 10
     for title in ['New Game', 'Undo', 'HighScores']:
         btn = Button(x=405, y=y, text=title, bgColor=(247, 245, 141), fontColor=(70, 73, 242))
@@ -590,76 +620,96 @@ def main():
     gotoSquare = None
 
     score = 0
+    gameOver = False
 
     clock = pygame.time.Clock()
     run = True
     while run:
         clock.tick(60)
-        draw(WIN, grid, buttons, score)
+        draw(WIN, grid, buttons, score, goBoard)
         score += grid.checking(score)
+
+        # Loop through all events in 1 frames
         for event in pygame.event.get():
+
+            # Get mouse position
             pos = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 run = False
                 break
-            
+
+            # Event for left mouse click
             if pygame.mouse.get_pressed()[0]:
-                if grid.isCliked(pos):
-                    row, col = grid.getPosition(pos)
-                    spot = grid.grid[row][col]
+                if not gameOver:
+                    if grid.isCliked(pos):
+                        row, col = grid.getPosition(pos)
+                        spot = grid.grid[row][col]
 
-                    if not selectedSquare:
-                        if spot.alive:
-                            if not spot.selected:
-                                spot.selected = True
-                                selectedSquare = spot
-                    
-                    elif selectedSquare == spot:
-                        spot.selected = False
-                        selectedSquare = None
+                        if not selectedSquare:
+                            if spot.alive:
+                                if not spot.selected:
+                                    spot.selected = True
+                                    selectedSquare = spot
+                        
+                        elif selectedSquare == spot:
+                            spot.selected = False
+                            selectedSquare = None
 
-                    elif selectedSquare and spot != selectedSquare:
-                        if not spot.alive:
-                            selectedSquare.selected = False
-                            gotoSquare = spot
+                        elif selectedSquare and spot != selectedSquare:
+                            if not spot.alive:
+                                selectedSquare.selected = False
+                                gotoSquare = spot
 
-                            for row in grid.grid:
-                                for square in row:
-                                    square.getMovableSquare(grid.grid)
-                            
-                            grid.saveSate(score)
-                            moved = grid.findShortestPath(
-                                selectedSquare, gotoSquare, lambda: draw(WIN, grid, buttons, score)
-                            )
+                                for row in grid.grid:
+                                    for square in row:
+                                        square.getMovableSquare(grid.grid)
+                                
+                                grid.saveSate(score)
+                                moved = grid.findShortestPath(selectedSquare, gotoSquare)
 
-                            if moved:
-                                point = grid.checking(score)
-                                selectedSquare = None
-                                gotoSquare = None
-                                score += point
+                                if moved:
+                                    point = grid.checking(score)
+                                    selectedSquare = None
+                                    gotoSquare = None
+                                    score += point
 
-                                if point == 0:
-                                    grid.grownUp()
-                                    grid.makeBabies()
+                                    if point == 0:
+                                        grid.grownUp()
+                                        grid.makeBabies()
+                                
+                                else:
+                                    selectedSquare.selected = True
                             
                             else:
-                                selectedSquare.selected = True
-                        
-                        else:
-                            selectedSquare.selected = False
-                            spot.selected = True
-                            selectedSquare = spot
+                                selectedSquare.selected = False
+                                spot.selected = True
+                                selectedSquare = spot
+                
+                else:
+                    pass
                 
                 for button in buttons:
-                    if button.isClicked(pos):
+                    if button.isPointed(pos):
+                        button.isPressed = True
                         if button.text == "New Game":
                             selectedSquare = None
                             gotoSquare = None
                             score = 0
                             grid.resetNewRound()
+                            gameOver = False
+                            goBoard.activated = False
                         
-                        if button.text == "Undo":
+                        if button.text == "Undo" and not gameOver:
                             score = grid.undo()
+            
+            # Detect release mouse after clicked
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:               # Left mouse click
+                    for button in buttons:
+                        if button.isPointed(pos):
+                            button.isPressed = False
 
-
+        if len(grid.freeSpots) <= grid.newBabies:
+            gameOver = True
+            goBoard.activated = True
 main()
