@@ -31,7 +31,7 @@ GREEN = (62, 224, 86)
 
 ICON_IMAGES = pygame.image.load('./images/line98.png')
 SCORE_DISPLAY = pygame.image.load('./images/scoreDisplay.png')
-GAMEOVER_IMAGE = pygame.image.load('./images/gameOver4.png')
+GAMEOVER_IMAGE = pygame.image.load('./images/gameOver5.png')
 CLOSEICON = pygame.image.load('./images/cancel.png')
 
 # Ball's Images
@@ -180,7 +180,7 @@ class Grid():
         self.y = WIN_HEIGHT - self.height -  self.marginBottom
         
         # ...
-        self.newBabies = 20
+        self.newBabies = 40
         self.freeSpots = []
         self.babies = []
         self.lastState = []
@@ -513,12 +513,13 @@ class Grid():
 
 # $$$$$$$$$$$$********* Button *********$$$$$$$$$$$$ #
 class Button():
-    def __init__(self, x, y, width=120, height=30, text="A button", fontColor=WHITE, bgColor=BLACK):
+    def __init__(self, x, y, width=120, height=30, text="A button", font=BUTTON_FONT, fontColor=WHITE, bgColor=BLACK):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.text = text
+        self.font = font
         self.fontColor = fontColor
         self.bgColor = bgColor
 
@@ -531,7 +532,7 @@ class Button():
         pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height))
 
         # Center the text
-        text = BUTTON_FONT.render(self.text, True, fontColor)
+        text = self.font.render(self.text, True, fontColor)
         textWidth, textHeight = text.get_size()
         textX = self.x + (self.width - textWidth) // 2
         textY = self.y + (self.height - textHeight) // 2
@@ -561,15 +562,41 @@ class GameOverBoard():
         self.width = 250
         self.height = 250
 
+        self.score = 0
+
         self.activated = False
+        self.buttons = []
+
+        self.createButton()
     
+    def createButton(self):
+        font = pygame.font.Font('./fonts/Poppins-Bold.ttf', 12)
+
+        btnX = self.x + 50
+        btnY = self.y + self.height - 40
+        restartBtn = Button(btnX, btnY, text="Restart", width=90, font=font, fontColor=(247, 245, 141), bgColor=(70, 73, 242))
+
+        btnX = self.x + self.width - 90
+        btnY = self.y + self.height - 40
+        highScore = Button(btnX, btnY, text="HighScores", width=90, font=font, fontColor=(247, 245, 141), bgColor=(70, 73, 242))
+
+        self.buttons.append(restartBtn)
+        self.buttons.append(highScore)
+
     def draw(self, win):
         if self.activated:
             win.blit(GAMEOVER_IMAGE, (175, 200))
 
-            closeX = self.x + self.width - 16
-            closeY = self.y - 32
-            win.blit(CLOSEICON, (closeX, closeY))
+            # pygame.font.Font('./fonts/CursedTimerUlil-Aznm.ttf', 30, bold=True)
+            scoreText = SCORE_FONT.render(f"{self.score}", True, RED)
+            textWidth, _ = scoreText.get_size()
+            textX = self.x + (self.width - textWidth) // 2
+            textY = self.y + 20
+            win.blit(scoreText, (textX, textY))
+
+
+            for btn in self.buttons:
+                btn.draw(win)
     
     def isClose(self):
         pass
@@ -686,30 +713,48 @@ def main():
                                 selectedSquare = spot
                 
                 else:
-                    pass
-                
+                    # Gameover Button
+                    for btn in goBoard.buttons:
+                        if btn.isPointed(pos):
+                            btn.isPressed = True
+
+                # Ingame buttons
                 for button in buttons:
                     if button.isPointed(pos):
                         button.isPressed = True
-                        if button.text == "New Game":
-                            selectedSquare = None
-                            gotoSquare = None
-                            score = 0
-                            grid.resetNewRound()
-                            gameOver = False
-                            goBoard.activated = False
-                        
-                        if button.text == "Undo" and not gameOver:
-                            score = grid.undo()
             
             # Detect release mouse after clicked
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:               # Left mouse click
                     for button in buttons:
-                        if button.isPointed(pos):
+                        if button.isPressed:
                             button.isPressed = False
+
+                            if button.text == "New Game":
+                                selectedSquare = None
+                                gotoSquare = None
+                                score = 0
+                                grid.resetNewRound()
+                                gameOver = False
+                                goBoard.activated = False
+                            
+                            if button.text == "Undo" and not gameOver:
+                                score = grid.undo()
+                    
+                    if gameOver:
+                        for btn in goBoard.buttons:
+                            if btn.isPressed:
+                                btn.isPressed = False
+                                if btn.text == "Restart":
+                                    selectedSquare = None
+                                    gotoSquare = None
+                                    score = 0
+                                    grid.resetNewRound()
+                                    gameOver = False
+                                    goBoard.activated = False
 
         if len(grid.freeSpots) <= grid.newBabies:
             gameOver = True
             goBoard.activated = True
+            goBoard.score = score
 main()
