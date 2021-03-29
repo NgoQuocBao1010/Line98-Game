@@ -513,7 +513,7 @@ class Grid():
 
 # $$$$$$$$$$$$********* Button *********$$$$$$$$$$$$ #
 class Button():
-    def __init__(self, x, y, width=120, height=30, text="A button", font=BUTTON_FONT, fontColor=WHITE, bgColor=BLACK):
+    def __init__(self, x, y, width=120, height=30, text="Button", font=BUTTON_FONT, fontPressedColor=None, fontColor=WHITE, bgColor=BLACK):
         self.x = x
         self.y = y
         self.width = width
@@ -521,15 +521,23 @@ class Button():
         self.text = text
         self.font = font
         self.fontColor = fontColor
+        self.fontPressedColor = fontPressedColor
         self.bgColor = bgColor
 
         self.isPressed = False
 
     def draw(self, win):
-        backGroundColor = BLACK if self.isPressed else self.bgColor
-        fontColor = WHITE if self.isPressed else self.fontColor
+        backGroundColor = self.bgColor
 
-        pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height))
+        if self.fontPressedColor:
+            fontColor = self.fontPressedColor if self.isPressed else self.fontColor
+        else:
+            fontColor = self.fontColor
+
+        if self.isPressed:
+            pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height))
+        else:
+            pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height), 3)
 
         # Center the text
         text = self.font.render(self.text, True, fontColor)
@@ -574,11 +582,11 @@ class GameOverBoard():
 
         btnX = self.x + 50
         btnY = self.y + self.height - 40
-        restartBtn = Button(btnX, btnY, text="Restart", width=90, font=font, fontColor=(247, 245, 141), bgColor=(70, 73, 242))
+        restartBtn = Button(btnX, btnY, text="Restart", width=90, font=font, fontPressedColor=WHITE, bgColor=(70, 73, 242), fontColor=(70, 73, 242))
 
         btnX = self.x + self.width - 90
         btnY = self.y + self.height - 40
-        highScore = Button(btnX, btnY, text="HighScores", width=90, font=font, fontColor=(247, 245, 141), bgColor=(70, 73, 242))
+        highScore = Button(btnX, btnY, text="HighScores", width=90, font=font, fontPressedColor=WHITE, bgColor=(70, 73, 242), fontColor=(70, 73, 242))
 
         self.buttons.append(restartBtn)
         self.buttons.append(highScore)
@@ -600,6 +608,11 @@ class GameOverBoard():
     
     def isClose(self):
         pass
+
+
+# $$$$$$$$$$$$********* GameOver Board *********$$$$$$$$$$$$ #
+class HighscoreBoard():
+    pass
 
 
 # Update main win everey frame
@@ -632,7 +645,7 @@ def main():
     grid = Grid()
     grid.resetNewRound()
 
-    goBoard = GameOverBoard()
+    board = GameOverBoard()
 
     buttons = []
 
@@ -653,7 +666,7 @@ def main():
     run = True
     while run:
         clock.tick(60)
-        draw(WIN, grid, buttons, score, goBoard)
+        draw(WIN, grid, buttons, score, board)
         score += grid.checking(score)
 
         # Loop through all events in 1 frames
@@ -714,7 +727,7 @@ def main():
                 
                 else:
                     # Gameover Button
-                    for btn in goBoard.buttons:
+                    for btn in board.buttons:
                         if btn.isPointed(pos):
                             btn.isPressed = True
 
@@ -736,13 +749,13 @@ def main():
                                 score = 0
                                 grid.resetNewRound()
                                 gameOver = False
-                                goBoard.activated = False
+                                board.activated = False
                             
                             if button.text == "Undo" and not gameOver:
                                 score = grid.undo()
                     
                     if gameOver:
-                        for btn in goBoard.buttons:
+                        for btn in board.buttons:
                             if btn.isPressed:
                                 btn.isPressed = False
                                 if btn.text == "Restart":
@@ -751,10 +764,10 @@ def main():
                                     score = 0
                                     grid.resetNewRound()
                                     gameOver = False
-                                    goBoard.activated = False
+                                    board.activated = False
 
         if len(grid.freeSpots) <= grid.newBabies:
             gameOver = True
-            goBoard.activated = True
-            goBoard.score = score
+            board.activated = True
+            board.score = score
 main()
