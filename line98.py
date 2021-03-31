@@ -65,6 +65,19 @@ IMAGES = {
 }
 
 
+# Sounds
+SOUNDS_EFFECT = {
+    'start': pygame.mixer.Sound('./sounds/ctcht.mp3'),
+    'newgame': pygame.mixer.Sound('./sounds/newgame.wav'),
+    'moved': pygame.mixer.Sound('./sounds/moved.wav'),
+    'undo': pygame.mixer.Sound('./sounds/undo.wav'),
+    'scored': pygame.mixer.Sound('./sounds/scored.wav'),
+    'gameover': pygame.mixer.Sound('./sounds/gameover.wav'),
+    'highscore': pygame.mixer.Sound('./sounds/highscore.wav'),
+}
+
+
+
 # $$$$$$$$$$$$********* Square contains 1 ball *********$$$$$$$$$$$$ #
 class Spot():
     def __init__(self, row, column):
@@ -186,7 +199,7 @@ class Grid():
         self.y = WIN_HEIGHT - self.height -  self.marginBottom
         
         # ...
-        self.newBabies = 20
+        self.newBabies = 3
         self.freeSpots = []
         self.babies = []
         self.lastState = []
@@ -398,6 +411,9 @@ class Grid():
         # Score animation
         newScore = currentScore + point
 
+        if newScore > currentScore:
+            SOUNDS_EFFECT.get('scored').play()
+        
         while currentScore < newScore:
             currentScore += 1
             scoreText = SCORE_FONT.render(f"{currentScore}", True, WHITE)
@@ -774,6 +790,7 @@ def main():
     gameOver = False
     hsOverlay = False
 
+    startSong = SOUNDS_EFFECT.get('start').play(-1)
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -820,6 +837,7 @@ def main():
                                 moved = grid.findShortestPath(selectedSquare, gotoSquare)
 
                                 if moved:
+                                    SOUNDS_EFFECT.get('moved').play()
                                     point = grid.checking(score)
                                     selectedSquare = None
                                     gotoSquare = None
@@ -867,10 +885,12 @@ def main():
                                 gotoSquare = None
                                 score = 0
                                 grid.resetNewRound()
+                                SOUNDS_EFFECT.get('newgame').play()
                                 gameOver = False
                                 goBoard.activated = False
                             
                             if button.text == "Undo" and not gameOver:
+                                SOUNDS_EFFECT.get('undo').play()
                                 score = grid.undo()
                             
                             if button.text == "HighScores":
@@ -888,6 +908,7 @@ def main():
                                     selectedSquare = None
                                     gotoSquare = None
                                     score = 0
+                                    SOUNDS_EFFECT.get('newgame').play()
                                     grid.resetNewRound()
                                     gameOver = False
                                 
@@ -906,6 +927,7 @@ def main():
                                     selectedSquare = None
                                     gotoSquare = None
                                     score = 0
+                                    SOUNDS_EFFECT.get('newgame').play()
                                     grid.resetNewRound()
                                     gameOver = False
                                     goBoard.activated = False
@@ -914,10 +936,16 @@ def main():
         if len(grid.freeSpots) <= grid.newBabies:
             if not gameOver:
                 goBoard.newHighscore = hsBoard.updateScore(score)
+
+                if goBoard.newHighscore:
+                    SOUNDS_EFFECT.get('highscore').play()
+                else:
+                    SOUNDS_EFFECT.get('gameover').play()
             
             selectedSquare = None
             gotoSquare = None
             gameOver = True
             goBoard.activated = True
             goBoard.score = score
+            
 main()
