@@ -548,26 +548,43 @@ class Button():
 
         self.isPressed = False
 
+        self.useImage = False
+        self.mainImg = None
+        self.pressedImg = None
+    
+    def imageConfig(self, mainImg, pressedImg):
+        self.useImage = True
+        self.mainImg = mainImg
+        self.pressedImg = pressedImg
+
     def draw(self, win):
-        backGroundColor = self.bgColor
+        if not self.useImage:
+            backGroundColor = self.bgColor
 
-        if self.fontPressedColor:
-            fontColor = self.fontPressedColor if self.isPressed else self.fontColor
-        else:
-            fontColor = self.fontColor
+            if self.fontPressedColor:
+                fontColor = self.fontPressedColor if self.isPressed else self.fontColor
+            else:
+                fontColor = self.fontColor
 
-        if self.isPressed:
-            pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height))
-        else:
-            pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height), 3)
+            if self.isPressed:
+                pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height))
+            else:
+                pygame.draw.rect(win, backGroundColor, (self.x, self.y, self.width, self.height), 3)
 
-        # Center the text
-        text = self.font.render(self.text, True, fontColor)
-        textWidth, textHeight = text.get_size()
-        textX = self.x + (self.width - textWidth) // 2
-        textY = self.y + (self.height - textHeight) // 2
+            # Center the text
+            text = self.font.render(self.text, True, fontColor)
+            textWidth, textHeight = text.get_size()
+            textX = self.x + (self.width - textWidth) // 2
+            textY = self.y + (self.height - textHeight) // 2
+            
+            win.blit(text, (textX, textY))
         
-        win.blit(text, (textX, textY))
+        else:
+            # pygame.draw.rect(win, WHITE, (self.x, self.y, self.width, self.height))
+            if self.isPressed:
+                win.blit(self.pressedImg, (self.x, self.y))
+            else:
+                win.blit(self.mainImg, (self.x, self.y))
     
     def isPointed(self, pos):
         mouseX, mouseY = pos
@@ -740,29 +757,57 @@ class HighscoreBoard():
 # $$$$$$$$$$$$********* Message Board *********$$$$$$$$$$$$ #
 class MessageBoard():
     def __init__(self):
-        self.x = 175
+        self.x = 150
         self.y = 200
-        self.width = 250
+        self.width = 300
         self.height = 250
 
-        self.title = "Ok or Cancel"
-        self.message = "No message"
+        self.title = "Save Game"
+        self.message = "Are you sure to stop playing?"
+        self.buttons = []
 
-        self.headerFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 21)
+        self.headerFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 30)
+        self.msgFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 15)
 
         self.activated = False
+
+        self.createButton()
+    
+    def createButton(self):
+        font = pygame.font.Font('./fonts/Poppins-Bold.ttf', 12)
+
+        btnX = self.x + 20
+        btnY = self.y + self.height - 40
+        restartBtn = Button(btnX, btnY, text="OK", width=90, font=font, fontPressedColor=WHITE, bgColor=(70, 73, 242), fontColor=(70, 73, 242))
+
+        btnX = self.x + self.width - 110
+        btnY = self.y + self.height - 40
+        closeBtn = Button(btnX, btnY, text="Cancel", width=90, font=font, fontPressedColor=WHITE, bgColor=(70, 73, 242), fontColor=(70, 73, 242))
+
+        self.buttons.append(restartBtn)
+        self.buttons.append(closeBtn)
     
     def draw(self, win):
         pygame.draw.rect(win, LIGHTYELLOW, (self.x, self.y, self.width, self.height))
-        headerText = self.headerFont.render(f"{self.title}", True, BLUE)
+
+        headerText = self.headerFont.render(f"{self.title}", True, RED)
         textWidth, _ = headerText.get_size()
         textX = self.x + (self.width - textWidth) // 2
         textY = self.y + 20
         win.blit(headerText, (textX, textY))
 
+        msgText = self.msgFont.render(f"{self.message}", True, BLUE)
+        textWidth, _ = msgText.get_size()
+        textX = self.x + (self.width - textWidth) // 2
+        textY = self.y + 100
+        win.blit(msgText, (textX, textY))
+
+        for btn in self.buttons:
+            btn.draw(win)
+
 
 # Update main win everey frame
-def draw(win, grid, buttons, score=0, goBoard=None, hsBoard=None):
+def draw(win, grid, buttons, score=0, goBoard=None, hsBoard=None, msgBoard=None):
     win.fill(TURQUOISE)
     grid.draw(win)
     
@@ -785,9 +830,9 @@ def draw(win, grid, buttons, score=0, goBoard=None, hsBoard=None):
 
     if hsBoard:
         hsBoard.draw(win)
-    
-    img = pygame.image.load('./images/undo.png')
-    win.blit(img, (225, 90))
+
+    if msgBoard:
+        msgBoard.draw(win)
     
     pygame.display.update()
 
@@ -805,7 +850,7 @@ def main():
 
     # Create button 
     y = 10
-    for title in ['New Game', 'Undo', 'HighScores']:
+    for title in ['New Game', 'HighScores', 'Exit']:
         btn = Button(x=405, y=y, text=title, bgColor=(247, 245, 141), fontColor=(70, 73, 242))
         buttons.append(btn)
         y += 40
@@ -813,24 +858,30 @@ def main():
     # Create button 
     btnX = 225
     for title in ['Save', 'Undo']:
-        btn = Button(x=btnX, y=80, text=title, width=32, height=32, bgColor=(247, 245, 141), fontColor=(70, 73, 242))
+        btn = Button(x=btnX, y=95, text=title, width=32, height=32)
+
+        mainImgUrl = f'./images/{title.lower()}.png'
+        pressedImgUrl = f'./images/{title.lower()}Pressed.png'
+        btn.imageConfig(pygame.image.load(mainImgUrl), pygame.image.load(pressedImgUrl))
         buttons.append(btn)
-        btnX += 100
+        btnX += 90
 
     selectedSquare = None
     gotoSquare = None
 
     score = 0
     gameOver = False
-    hsOverlay = False
+    overlay = False
 
     startSong = SOUNDS_EFFECT.get('start').play(-1)
     clock = pygame.time.Clock()
     run = True
     while run:
         clock.tick(60)
-        draw(WIN, grid, buttons, score, goBoard, hsBoard)
-        score += grid.checking(score)
+        draw(WIN, grid, buttons, score, goBoard, hsBoard, msgBoard)
+
+        if not gameOver:
+            score += grid.checking(score)
 
         # Loop through all events in 1 frames
         for event in pygame.event.get():
@@ -843,7 +894,7 @@ def main():
 
             # Event for left mouse click
             if pygame.mouse.get_pressed()[0]:
-                if not gameOver and not hsOverlay:
+                if not gameOver and not overlay:
                     if grid.isCliked(pos):
                         row, col = grid.getPosition(pos)
                         spot = grid.grid[row][col]
@@ -895,7 +946,7 @@ def main():
                         if btn.isPointed(pos):
                             btn.isPressed = True
                 
-                if hsOverlay:
+                if overlay:
                     # Highscore Board Button
                     for btn in hsBoard.buttons:
                         if btn.isPointed(pos):
@@ -928,8 +979,11 @@ def main():
                                 score = grid.undo()
                             
                             if button.text == "HighScores":
-                                hsOverlay = True
+                                overlay = True
                                 hsBoard.activated = True
+                            
+                            if button.text == "Save":
+                                grid.freeSpots = []
                     
                     # Game Over Board buttons
                     if gameOver:
@@ -947,14 +1001,14 @@ def main():
                                     gameOver = False
                                 
                                 if btn.text == "HighScores":
-                                    hsOverlay = True
+                                    overlay = True
                                     hsBoard.activated = True
 
-                    if hsOverlay:
+                    if overlay:
                         for btn in hsBoard.buttons:
                             if btn.isPressed:
                                 btn.isPressed = False
-                                hsOverlay = False
+                                overlay = False
                                 hsBoard.activated = False
 
                                 if btn.text == "Restart":
@@ -965,7 +1019,6 @@ def main():
                                     grid.resetNewRound()
                                     gameOver = False
                                     goBoard.activated = False
-
 
         if len(grid.freeSpots) <= grid.newBabies:
             if not gameOver:
