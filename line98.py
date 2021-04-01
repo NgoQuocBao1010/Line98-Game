@@ -417,8 +417,8 @@ class Grid():
         while currentScore < newScore:
             currentScore += 1
             scoreText = SCORE_FONT.render(f"{currentScore}", True, WHITE)
-            WIN.blit(SCORE_DISPLAY, (225, 70))
-            WIN.blit(scoreText, (240, 80))
+            WIN.blit(SCORE_DISPLAY, (225, 40))
+            WIN.blit(scoreText, (240, 50))
             pygame.time.delay(50)
             pygame.display.update()
         
@@ -737,6 +737,28 @@ class HighscoreBoard():
                 btn.draw(win)
 
 
+# $$$$$$$$$$$$********* Message Board *********$$$$$$$$$$$$ #
+class MessageBoard():
+    def __init__(self):
+        self.x = 175
+        self.y = 200
+        self.width = 250
+        self.height = 250
+
+        self.title = "Ok or Cancel"
+        self.message = "No message"
+
+        self.headerFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 21)
+
+        self.activated = False
+    
+    def draw(self, win):
+        pygame.draw.rect(win, LIGHTYELLOW, (self.x, self.y, self.width, self.height))
+        headerText = self.headerFont.render(f"{self.title}", True, BLUE)
+        textWidth, _ = headerText.get_size()
+        textX = self.x + (self.width - textWidth) // 2
+        textY = self.y + 20
+        win.blit(headerText, (textX, textY))
 
 
 # Update main win everey frame
@@ -748,11 +770,11 @@ def draw(win, grid, buttons, score=0, goBoard=None, hsBoard=None):
 
     # score text
     text = SCORE_TEXT_FONT.render("Score", True, RED)
-    win.blit(text, (225, 40))
+    win.blit(text, (225, 10))
 
     scoreText = SCORE_FONT.render(f"{score}", True, WHITE)
-    win.blit(SCORE_DISPLAY, (225, 70))
-    win.blit(scoreText, (240, 80))
+    win.blit(SCORE_DISPLAY, (225, 40))
+    win.blit(scoreText, (240, 50))
 
     # Buttons
     for btn in buttons:
@@ -764,6 +786,9 @@ def draw(win, grid, buttons, score=0, goBoard=None, hsBoard=None):
     if hsBoard:
         hsBoard.draw(win)
     
+    img = pygame.image.load('./images/undo.png')
+    win.blit(img, (225, 90))
+    
     pygame.display.update()
 
 
@@ -774,6 +799,8 @@ def main():
     goBoard = GameOverBoard()
     hsBoard = HighscoreBoard()
 
+    msgBoard = MessageBoard()
+
     buttons = []
 
     # Create button 
@@ -782,6 +809,13 @@ def main():
         btn = Button(x=405, y=y, text=title, bgColor=(247, 245, 141), fontColor=(70, 73, 242))
         buttons.append(btn)
         y += 40
+
+    # Create button 
+    btnX = 225
+    for title in ['Save', 'Undo']:
+        btn = Button(x=btnX, y=80, text=title, width=32, height=32, bgColor=(247, 245, 141), fontColor=(70, 73, 242))
+        buttons.append(btn)
+        btnX += 100
 
     selectedSquare = None
     gotoSquare = None
