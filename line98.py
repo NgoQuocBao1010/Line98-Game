@@ -70,6 +70,7 @@ SOUNDS_EFFECT = {
     'start': pygame.mixer.Sound('./sounds/ctcht.mp3'),
     'newgame': pygame.mixer.Sound('./sounds/newgame.wav'),
     'moved': pygame.mixer.Sound('./sounds/moved.wav'),
+    'cantMoved': pygame.mixer.Sound('./sounds/cantMoved.mp3'),
     'undo': pygame.mixer.Sound('./sounds/undo.wav'),
     'scored': pygame.mixer.Sound('./sounds/scored.wav'),
     'gameover': pygame.mixer.Sound('./sounds/gameover.wav'),
@@ -952,6 +953,7 @@ def main():
                                         grid.makeBabies()
                                 
                                 else:
+                                    SOUNDS_EFFECT.get('cantMoved').play()
                                     selectedSquare.selected = True
                             
                             else:
