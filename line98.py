@@ -348,7 +348,6 @@ class Grid():
                     tempVList = [self.grid[row][col + 1], ]
             
                 if len(tempVList) >= 5:
-                    print('There are 5 in a row')
                     for spot in tempVList:
                         if spot not in deleteSpots:
                             deleteSpots.append(spot)
@@ -363,13 +362,13 @@ class Grid():
                     tempHList = [self.grid[row + 1][col], ]
             
                 if len(tempHList) >= 5:
-                    print('There are 5 in a column')
                     for spot in tempHList:
                         if spot not in deleteSpots:
                             deleteSpots.append(spot)
 
-        # Right to Left diaognal
+        # Top Right to Bottom Left diaognal
         for col in range(5):
+            tempDList = []
             for row in range(5):
                 if (
                     self.grid[row][col].isSame(self.grid[row + 1][col + 1]) and 
@@ -377,14 +376,21 @@ class Grid():
                     self.grid[row + 2][col + 2].isSame(self.grid[row + 3][col + 3]) and 
                     self.grid[row + 3][col + 3].isSame(self.grid[row + 4][col + 4])
                 ):
-                    deleteSpots.append(self.grid[row][col]);
-                    deleteSpots.append(self.grid[row + 1][col + 1]);
-                    deleteSpots.append(self.grid[row + 2][col + 2]);
-                    deleteSpots.append(self.grid[row + 3][col + 3]);
-                    deleteSpots.append(self.grid[row + 4][col + 4]);
+                    tempDList.append(self.grid[row][col]);
+                    tempDList.append(self.grid[row + 1][col + 1]);
+                    tempDList.append(self.grid[row + 2][col + 2]);
+                    tempDList.append(self.grid[row + 3][col + 3]);
+                    tempDList.append(self.grid[row + 4][col + 4]);
+                
+                if len(tempDList) >= 5:
+                    for spot in tempDList:
+                        if spot not in deleteSpots:
+                            deleteSpots.append(spot)
         
-        # Left to Right diaognal
+        
+        # Top Left to Right diaognal
         for col in range(4, self.cols):
+            tempDList = []
             for row in range(5):
                 if (
                     self.grid[row][col].isSame(self.grid[row + 1][col - 1]) and 
@@ -392,11 +398,16 @@ class Grid():
                     self.grid[row + 2][col - 2].isSame(self.grid[row + 3][col - 3]) and 
                     self.grid[row + 3][col - 3].isSame(self.grid[row + 4][col - 4])
                 ):
-                    deleteSpots.append(self.grid[row][col]);
-                    deleteSpots.append(self.grid[row + 1][col - 1]);
-                    deleteSpots.append(self.grid[row + 2][col - 2]);
-                    deleteSpots.append(self.grid[row + 3][col - 3]);
-                    deleteSpots.append(self.grid[row + 4][col - 4]);
+                    tempDList.append(self.grid[row][col]);
+                    tempDList.append(self.grid[row + 1][col - 1]);
+                    tempDList.append(self.grid[row + 2][col - 2]);
+                    tempDList.append(self.grid[row + 3][col - 3]);
+                    tempDList.append(self.grid[row + 4][col - 4]);
+                
+                if len(tempDList) >= 5:
+                    for spot in tempDList:
+                        if spot not in deleteSpots:
+                            deleteSpots.append(spot)
 
 
         # Delete spots
@@ -762,8 +773,8 @@ class MessageBoard():
         self.width = 300
         self.height = 250
 
-        self.title = "Save Game"
-        self.message = "Are you sure to stop playing?"
+        self.title = ""
+        self.message = ""
         self.buttons = []
 
         self.headerFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 30)
@@ -787,23 +798,28 @@ class MessageBoard():
         self.buttons.append(restartBtn)
         self.buttons.append(closeBtn)
     
+    def invokeMessage(self, title, message):
+        self.title = title
+        self.message = message
+    
     def draw(self, win):
-        pygame.draw.rect(win, LIGHTYELLOW, (self.x, self.y, self.width, self.height))
+        if self.activated:
+            pygame.draw.rect(win, LIGHTYELLOW, (self.x, self.y, self.width, self.height))
 
-        headerText = self.headerFont.render(f"{self.title}", True, RED)
-        textWidth, _ = headerText.get_size()
-        textX = self.x + (self.width - textWidth) // 2
-        textY = self.y + 20
-        win.blit(headerText, (textX, textY))
+            headerText = self.headerFont.render(f"{self.title}", True, RED)
+            textWidth, _ = headerText.get_size()
+            textX = self.x + (self.width - textWidth) // 2
+            textY = self.y + 20
+            win.blit(headerText, (textX, textY))
 
-        msgText = self.msgFont.render(f"{self.message}", True, BLUE)
-        textWidth, _ = msgText.get_size()
-        textX = self.x + (self.width - textWidth) // 2
-        textY = self.y + 100
-        win.blit(msgText, (textX, textY))
+            msgText = self.msgFont.render(f"{self.message}", True, BLUE)
+            textWidth, _ = msgText.get_size()
+            textX = self.x + (self.width - textWidth) // 2
+            textY = self.y + 100
+            win.blit(msgText, (textX, textY))
 
-        for btn in self.buttons:
-            btn.draw(win)
+            for btn in self.buttons:
+                btn.draw(win)
 
 
 # Update main win everey frame
@@ -837,6 +853,9 @@ def draw(win, grid, buttons, score=0, goBoard=None, hsBoard=None, msgBoard=None)
     pygame.display.update()
 
 
+
+
+# MAIN
 def main():
     grid = Grid()
     grid.resetNewRound()
@@ -947,10 +966,16 @@ def main():
                             btn.isPressed = True
                 
                 if overlay:
-                    # Highscore Board Button
-                    for btn in hsBoard.buttons:
-                        if btn.isPointed(pos):
-                            btn.isPressed = True
+                    if hsBoard.activated:
+                        # Highscore Board Button
+                        for btn in hsBoard.buttons:
+                            if btn.isPointed(pos):
+                                btn.isPressed = True
+                    
+                    if msgBoard.activated:
+                        for btn in msgBoard.buttons:
+                            if btn.isPointed(pos):
+                                btn.isPressed = True
 
                 # Ingame buttons
                 for button in buttons:
@@ -974,16 +999,23 @@ def main():
                                 gameOver = False
                                 goBoard.activated = False
                             
-                            if button.text == "Undo" and not gameOver:
-                                SOUNDS_EFFECT.get('undo').play()
-                                score = grid.undo()
-                            
                             if button.text == "HighScores":
                                 overlay = True
                                 hsBoard.activated = True
+
+                            if button.text == "Exit":
+                                overlay = True
+                                msgBoard.activated = True
+                                msgBoard.invokeMessage('Exit Game', 'Your score wont be saved? Continue?')
                             
                             if button.text == "Save":
-                                grid.freeSpots = []
+                                overlay = True
+                                msgBoard.activated = True
+                                msgBoard.invokeMessage('Save Game', 'Are you sure to stop playing?')
+                            
+                            if button.text == "Undo" and not gameOver:
+                                SOUNDS_EFFECT.get('undo').play()
+                                score = grid.undo()
                     
                     # Game Over Board buttons
                     if gameOver:
@@ -1005,20 +1037,37 @@ def main():
                                     hsBoard.activated = True
 
                     if overlay:
-                        for btn in hsBoard.buttons:
-                            if btn.isPressed:
-                                btn.isPressed = False
-                                overlay = False
-                                hsBoard.activated = False
+                        if hsBoard.activated:
+                            for btn in hsBoard.buttons:
+                                if btn.isPressed:
+                                    btn.isPressed = False
+                                    overlay = False
+                                    hsBoard.activated = False
 
-                                if btn.text == "Restart":
-                                    selectedSquare = None
-                                    gotoSquare = None
-                                    score = 0
-                                    SOUNDS_EFFECT.get('newgame').play()
-                                    grid.resetNewRound()
-                                    gameOver = False
-                                    goBoard.activated = False
+                                    if btn.text == "Restart":
+                                        selectedSquare = None
+                                        gotoSquare = None
+                                        score = 0
+                                        SOUNDS_EFFECT.get('newgame').play()
+                                        grid.resetNewRound()
+                                        gameOver = False
+                                        goBoard.activated = False
+                        
+                        if msgBoard.activated:
+                            for btn in msgBoard.buttons:
+                                if btn.isPressed:
+                                    btn.isPressed = False
+                                    overlay = False
+                                    msgBoard.activated = False
+
+                                    if btn.text == "OK":
+                                        if msgBoard.title == "Save Game":
+                                            grid.freeSpots = []
+
+                                        if msgBoard.title == "Exit Game":
+                                            run = False
+                                            break
+
 
         if len(grid.freeSpots) <= grid.newBabies:
             if not gameOver:
