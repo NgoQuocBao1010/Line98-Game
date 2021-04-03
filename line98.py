@@ -999,7 +999,10 @@ def main():
                                 grid.resetNewRound()
                                 SOUNDS_EFFECT.get('newgame').play()
                                 gameOver = False
+                                overlay = False
                                 goBoard.activated = False
+                                hsBoard.activated = False
+                                msgBoard.activated = False
                             
                             if button.text == "HighScores":
                                 overlay = True
