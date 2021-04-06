@@ -334,7 +334,7 @@ class Grid():
         
     # checking grid conditions
     # Delete and increase score
-    def checking(self, currentScore):
+    def checking(self, win, currentScore):
         point = 0
         deleteSpots = []
 
@@ -414,8 +414,8 @@ class Grid():
         # Delete spots
         for spot in deleteSpots:
             spot.makeDead()
-            spot.draw(WIN)
-            self.drawLine(WIN)
+            spot.draw(win)
+            self.drawLine(win)
             pygame.time.delay(70)
             point += 1
             pygame.display.update()
@@ -429,8 +429,8 @@ class Grid():
         while currentScore < newScore:
             currentScore += 1
             scoreText = SCORE_FONT.render(f"{currentScore}", True, WHITE)
-            WIN.blit(SCORE_DISPLAY, (225, 40))
-            WIN.blit(scoreText, (240, 50))
+            win.blit(SCORE_DISPLAY, (225, 40))
+            win.blit(scoreText, (240, 50))
             pygame.time.delay(50)
             pygame.display.update()
         
@@ -447,7 +447,7 @@ class Grid():
         return point
 
     # ****************** BFS Algorithm ****************** #
-    def findShortestPath(self, start, end):
+    def findShortestPath(self, win, start, end):
         distance = [[-1 for spot in range(self.rows + 1)] for row in range(self.rows + 1)]
         prev = [[None for spot in range(self.rows + 1)] for row in range(self.rows + 1)]
         path = []
@@ -500,9 +500,9 @@ class Grid():
                             c_y -= 1
 
                         for spot in prevPath:
-                            spot.draw(WIN)
-                        self.drawLine(WIN)
-                        WIN.blit(img, (c_x, c_y))
+                            spot.draw(win)
+                        self.drawLine(win)
+                        win.blit(img, (c_x, c_y))
 
                         # pygame.time.delay(20)
                         pygame.display.update()
@@ -901,7 +901,7 @@ def main():
         draw(WIN, grid, buttons, score, goBoard, hsBoard, msgBoard)
 
         if not gameOver:
-            score += grid.checking(score)
+            score += grid.checking(WIN, score)
 
         # Loop through all events in 1 frames
         for event in pygame.event.get():
@@ -939,11 +939,11 @@ def main():
                                         square.getMovableSquare(grid.grid)
                                 
                                 grid.saveSate(score)
-                                moved = grid.findShortestPath(selectedSquare, gotoSquare)
+                                moved = grid.findShortestPath(WIN, selectedSquare, gotoSquare)
 
                                 if moved:
                                     SOUNDS_EFFECT.get('moved').play()
-                                    point = grid.checking(score)
+                                    point = grid.checking(WIN, score)
                                     selectedSquare = None
                                     gotoSquare = None
                                     score += point
