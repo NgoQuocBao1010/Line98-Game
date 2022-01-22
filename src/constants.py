@@ -77,10 +77,12 @@ IMAGES = {
     },
 }
 
+# Remove song because of license
+backgroundMusic = getFullPath('./sounds/ctcht.mp3') if getFullPath('./sounds/ctcht.mp3') else getFullPath('./sounds/Makani – Scandinavianz & AXM (No Copyright Music) (64 kbps).mp3')
 
 # Sounds
 SOUNDS_EFFECT = {
-    'start': pygame.mixer.Sound(getFullPath('./sounds/ctcht.mp3')),
+    'start': pygame.mixer.Sound(backgroundMusic),
     'newgame': pygame.mixer.Sound(getFullPath('./sounds/newgame.wav')),
     'moved': pygame.mixer.Sound(getFullPath('./sounds/moved.wav')),
     'cantMoved': pygame.mixer.Sound(getFullPath('./sounds/cantMoved.mp3')),
