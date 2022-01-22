@@ -1,6 +1,6 @@
 # Game config
-*.txt
-**/highscores
+**/highscores.txt
+**/ctcht.mp3
 
 .vscode/
 # Byte-compiled / optimized / DLL files
