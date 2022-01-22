@@ -526,8 +526,8 @@ def main():
     for title in ['Save', 'Undo']:
         btn = Button(x=btnX, y=95, text=title, width=32, height=32)
 
-        mainImgUrl = f'./images/{title.lower()}.png'
-        pressedImgUrl = f'./images/{title.lower()}Pressed.png'
+        mainImgUrl = getFullPath(f'./images/{title.lower()}.png')
+        pressedImgUrl = getFullPath(f'./images/{title.lower()}Pressed.png')
         btn.imageConfig(pygame.image.load(mainImgUrl), pygame.image.load(pressedImgUrl))
         buttons.append(btn)
         btnX += 90
