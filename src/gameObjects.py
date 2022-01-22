@@ -1,4 +1,4 @@
-from globals import *
+from .constants import *
 
 # $$$$$$$$$$$$********* Button *********$$$$$$$$$$$$ #
 class Button():

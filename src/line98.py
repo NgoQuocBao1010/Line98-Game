@@ -1,5 +1,5 @@
-from utils import *
-
+from .gameObjects import *
+import random
 
 
 # $$$$$$$$$$$$********* Square contains 1 ball *********$$$$$$$$$$$$ #
@@ -734,5 +734,3 @@ def main():
             gameOver = True
             goBoard.activated = True
             goBoard.score = score
-            
-main()
