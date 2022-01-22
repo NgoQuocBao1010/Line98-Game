@@ -1,4 +1,15 @@
 import pygame
+import os
+
+def getFullPath(relativePath) -> str:
+    """ Return full absolute path of a relative path """
+
+    filePath = os.path.abspath(__file__)
+    folderPath = os.path.dirname(filePath)
+
+    absolutePath = os.path.join(folderPath, relativePath)
+    return absolutePath if os.path.exists(absolutePath) else None
+
 
 # Pygame initilize
 pygame.init()
@@ -16,9 +27,9 @@ ROWS = COLS = 9
 
 
 # Fonts
-SCORE_TEXT_FONT = pygame.font.Font('./fonts/CursedTimerUlil-Aznm.ttf', 30)
-SCORE_FONT = pygame.font.Font('./fonts/CursedTimerUlil-Aznm.ttf', 30, bold=True)
-BUTTON_FONT = pygame.font.Font('./fonts/Poppins-Bold.ttf', 18)
+SCORE_TEXT_FONT = pygame.font.Font(getFullPath('./fonts/CursedTimerUlil-Aznm.ttf'), 30)
+SCORE_FONT = pygame.font.Font(getFullPath('./fonts/CursedTimerUlil-Aznm.ttf'), 30, bold=True)
+BUTTON_FONT = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 18)
 
 
 # Color Variables
@@ -33,45 +44,45 @@ LIGHTYELLOW = (235, 235, 99)
 
 
 # IMAGES
-ICON_IMAGES = pygame.image.load('./images/line98.png')
-SCORE_DISPLAY = pygame.image.load('./images/scoreDisplay.png')
-GAMEOVER_IMAGE = pygame.image.load('./images/gameOver.png')
-PODIUM = pygame.image.load('./images/podium.png')
-HIGHSCOREICON = pygame.image.load('./images/highscoreIcon.png')
+ICON_IMAGES = pygame.image.load(getFullPath('./images/line98.png'))
+SCORE_DISPLAY = pygame.image.load(getFullPath('./images/scoreDisplay.png'))
+GAMEOVER_IMAGE = pygame.image.load(getFullPath('./images/gameOver.png'))
+PODIUM = pygame.image.load(getFullPath('./images/podium.png'))
+HIGHSCOREICON = pygame.image.load(getFullPath('./images/highscoreIcon.png'))
 
 # Ball's Images
 IMAGES = {
     'yellow': {
-        'big': pygame.image.load('./images/big1.png'),
-        'small': pygame.image.load('./images/small1.png'),
+        'big': pygame.image.load(getFullPath('./images/big1.png')),
+        'small': pygame.image.load(getFullPath('./images/small1.png')),
     },
     'pink': {
-        'big': pygame.image.load('./images/big2.png'),
-        'small': pygame.image.load('./images/small2.png'),
+        'big': pygame.image.load(getFullPath('./images/big2.png')),
+        'small': pygame.image.load(getFullPath('./images/small2.png')),
     },
     'blue': {
-        'big': pygame.image.load('./images/big3.png'),
-        'small': pygame.image.load('./images/small3.png'),
+        'big': pygame.image.load(getFullPath('./images/big3.png')),
+        'small': pygame.image.load(getFullPath('./images/small3.png')),
     },
     'green': {
-        'big': pygame.image.load('./images/big4.png'),
-        'small': pygame.image.load('./images/small4.png'),
+        'big': pygame.image.load(getFullPath('./images/big4.png')),
+        'small': pygame.image.load(getFullPath('./images/small4.png')),
     },
     'red': {
-        'big': pygame.image.load('./images/big5.png'),
-        'small': pygame.image.load('./images/small5.png'),
+        'big': pygame.image.load(getFullPath('./images/big5.png')),
+        'small': pygame.image.load(getFullPath('./images/small5.png')),
     },
 }
 
 
 # Sounds
 SOUNDS_EFFECT = {
-    'start': pygame.mixer.Sound('./sounds/ctcht.mp3'),
-    'newgame': pygame.mixer.Sound('./sounds/newgame.wav'),
-    'moved': pygame.mixer.Sound('./sounds/moved.wav'),
-    'cantMoved': pygame.mixer.Sound('./sounds/cantMoved.mp3'),
-    'undo': pygame.mixer.Sound('./sounds/undo.wav'),
-    'scored': pygame.mixer.Sound('./sounds/scored.wav'),
-    'gameover': pygame.mixer.Sound('./sounds/gameover.wav'),
-    'highscore': pygame.mixer.Sound('./sounds/highscore.wav'),
+    'start': pygame.mixer.Sound(getFullPath('./sounds/ctcht.mp3')),
+    'newgame': pygame.mixer.Sound(getFullPath('./sounds/newgame.wav')),
+    'moved': pygame.mixer.Sound(getFullPath('./sounds/moved.wav')),
+    'cantMoved': pygame.mixer.Sound(getFullPath('./sounds/cantMoved.mp3')),
+    'undo': pygame.mixer.Sound(getFullPath('./sounds/undo.wav')),
+    'scored': pygame.mixer.Sound(getFullPath('./sounds/scored.wav')),
+    'gameover': pygame.mixer.Sound(getFullPath('./sounds/gameover.wav')),
+    'highscore': pygame.mixer.Sound(getFullPath('./sounds/highscore.wav')),
 }

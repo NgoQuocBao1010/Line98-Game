@@ -85,7 +85,7 @@ class GameOverBoard():
         self.createButton()
     
     def createButton(self):
-        font = pygame.font.Font('./fonts/Poppins-Bold.ttf', 12)
+        font = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 12)
 
         btnX = self.x + 20
         btnY = self.y + self.height - 40
@@ -124,10 +124,10 @@ class HighscoreBoard():
         self.width = 250
         self.height = 250
 
-        self.headerFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 21)
-        self.scoreFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 17)
-        self.firstPlace = pygame.font.Font('./fonts/Poppins-Bold.ttf', 22)
-        self.newHSFont = pygame.font.Font('./fonts/TopSecret.ttf', 22)
+        self.headerFont = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 21)
+        self.scoreFont = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 17)
+        self.firstPlace = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 22)
+        self.newHSFont = pygame.font.Font(getFullPath('./fonts/TopSecret.ttf'), 22)
 
         self.activated = False
         self.scores = []
@@ -138,7 +138,7 @@ class HighscoreBoard():
         self.getHighscore()
     
     def createButton(self):
-        font = pygame.font.Font('./fonts/Poppins-Bold.ttf', 12)
+        font = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 12)
 
         btnX = self.x + 20
         btnY = self.y + self.height - 40
@@ -233,15 +233,15 @@ class MessageBoard():
         self.message = ""
         self.buttons = []
 
-        self.headerFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 30)
-        self.msgFont = pygame.font.Font('./fonts/Poppins-Bold.ttf', 15)
+        self.headerFont = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 30)
+        self.msgFont = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 15)
 
         self.activated = False
 
         self.createButton()
     
     def createButton(self):
-        font = pygame.font.Font('./fonts/Poppins-Bold.ttf', 12)
+        font = pygame.font.Font(getFullPath('./fonts/Poppins-Bold.ttf'), 12)
 
         btnX = self.x + 20
         btnY = self.y + self.height - 40
