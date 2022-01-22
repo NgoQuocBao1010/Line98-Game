@@ -1,3 +1,4 @@
+from pickle import FALSE
 from .constants import *
 
 # $$$$$$$$$$$$********* Button *********$$$$$$$$$$$$ #
@@ -152,14 +153,14 @@ class HighscoreBoard():
         self.buttons.append(closeBtn)
     
     def getHighscore(self):
-        with open("highscores.txt") as f:
+        with open(getFullPath("highscores.txt", ignoreNonExist=True), "a+") as f:
             data = f.readlines()
-
+            
             # Removes 'break line'
             for i in range(len(data)):
                 data[i] = int(data[i].replace('\n', ''))
         
-        self.scores = data
+        self.scores = data if data else [0, 0, 0]
     
     def updateScore(self, newScore):
         self.newHighScore = True if newScore > self.scores[0] else False
@@ -173,7 +174,7 @@ class HighscoreBoard():
         # Remove bottom score
         self.scores = self.scores[0:-1]
 
-        with open("highscores.txt", "w+") as f:
+        with open(getFullPath("highscores.txt"), "w+") as f:
             for score in self.scores:
                 f.write(f"{score}\n")
         

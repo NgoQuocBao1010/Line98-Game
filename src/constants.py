@@ -1,13 +1,16 @@
 import pygame
 import os
 
-def getFullPath(relativePath) -> str:
+def getFullPath(relativePath, ignoreNonExist=False) -> str:
     """ Return full absolute path of a relative path """
 
     filePath = os.path.abspath(__file__)
     folderPath = os.path.dirname(filePath)
 
     absolutePath = os.path.join(folderPath, relativePath)
+
+    if ignoreNonExist: return absolutePath
+
     return absolutePath if os.path.exists(absolutePath) else None
 
 
