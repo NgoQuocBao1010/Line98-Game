@@ -19,7 +19,10 @@
 
 LINE 98 game was a project from a course in my university. This is a fully functional game with all of the required features.
 
-<p align="center"><img src="screenshots/gameplay1.png" alt="Welcome page" width="60%"></p>
+<p align="center"><img src="screenshots/gameplay1.png" alt="Welcome page" width="40%"></p>
+<p align="center"><img src="screenshots/gameplay2.png" alt="Welcome page" width="40%"></p>
+<p align="center"><img src="screenshots/gameplay3.png" alt="Welcome page" width="40%"></p>
+<p align="center"><img src="screenshots/gameplay4.png" alt="Welcome page" width="40%"></p>
 
 Apart from the main gameplay, here are some additional features that I built:
 * Undo a move.
@@ -58,32 +61,8 @@ This project is very simple to get started. Python and Pygame is the only requir
    python main.py
    ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 <!-- USAGE EXAMPLES -->
-## Gameplay
-
-<details>
-<summary>Some of the screenshots of the gameplay</summary>
-<br/>
-<ul>
-<li>
-    <p align="center"><img src="screenshots/gameplay2.png" alt="Gameplay 1" width="60%"></p>
-</li>
-<br/>
-<li>
-    <p align="center"><img src="screenshots/gameplay3.png" alt="Save game" width="60%"></p>
-</li>
-<br/>
-<li>
-    <p align="center"><img src="screenshots/gameplay4.png" alt="Highscore" width="60%"></p>
-</li>
-</ul>
-</details>
-
-<br/>
-
-_For more examples, please refer to my [university report](docs/NLCS-B1809677.pdf) on the project_
+_For more detail of usage and description, please refer to my [university report](docs/NLCS-B1809677.pdf) on the project_
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -118,8 +97,6 @@ Distributed under the MIT License.
 ## Contact me
 
 Ngô Hồng Quốc Bảo - [@NgoQuocBao](https://twitter.com/ngohquocbao1010)
-
-Project Link: [https://github.com/NgoQuocBao1010/Python---Line98-Game](https://github.com/NgoQuocBao1010/Python---Line98-Game)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
